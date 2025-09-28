@@ -47,25 +47,4 @@
 
 Welcome to ``my_icon_vault`` Documentation
 ==============================================================================
-.. image:: https://my-icon-vault.readthedocs.io/en/latest/_static/my_icon_vault-logo.png
-    :target: https://my-icon-vault.readthedocs.io/en/latest/
-
-Documentation for ``my_icon_vault``.
-
-
-.. _install:
-
-Install
-------------------------------------------------------------------------------
-
-``my_icon_vault`` is released on PyPI, so all you need is to:
-
-.. code-block:: console
-
-    $ pip install my-icon-vault
-
-To upgrade to latest version:
-
-.. code-block:: console
-
-    $ pip install --upgrade my-icon-vault
+这个 GitHub 仓库中保存了我个人的图标库数据资产.
