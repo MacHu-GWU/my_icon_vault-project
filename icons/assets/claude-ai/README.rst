@@ -1,0 +1,1 @@
+This is the official Claude AI icon, featuring a distinctive orange starburst or sunburst design with multiple radiating segments arranged in a circular pattern. The icon represents Claude, the AI assistant developed by Anthropic, and serves as the primary visual identifier for the Claude AI product across web platforms, mobile applications, and digital interfaces.
