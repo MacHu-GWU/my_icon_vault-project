@@ -77,7 +77,7 @@ class PngQuantArgs:
             args.extend(["--output", str(self.path_out)])
         return args
 
-    def run(self, path_bin: Path, path_in: Path):
+    def run(self, path_bin: Path, path_in: Path, verbose: bool = False):
         """
         Execute pngquant compression on a single file.
 
@@ -88,7 +88,8 @@ class PngQuantArgs:
         args = [str(path_bin)]
         args.extend(self.to_args())
         args.append(str(path_in))
-        print(" ".join(args))
+        if verbose:
+            print(" ".join(args))
         subprocess.run(args, check=True)
 
 
