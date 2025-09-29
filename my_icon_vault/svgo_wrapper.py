@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 
-import shutil
 import subprocess
 import dataclasses
 from pathlib import Path
+
+import mpire
 
 
 @dataclasses.dataclass
@@ -39,3 +40,24 @@ class SvgoCmd:
         if verbose:
             print(" ".join(args))
         subprocess.run(args, check=True)
+
+    @classmethod
+    def parallel_run(cls, cmds: list["SvgoCmd"]):
+        """
+        Batch optimize multiple SVG files in parallel using multiprocessing.
+
+        Args:
+            cmds: List of SvgoCmd instances for each file to optimize
+        """
+
+        def main(ith: int, cmd: SvgoCmd):
+            print(f"[{ith}] Compressing: {cmd.path_in} -> {cmd.path_out}")
+            cmd.run(verbose=False)
+
+        tasks = [{"ith": i, "cmd": cmd} for i, cmd in enumerate(cmds, start=1)]
+        with mpire.WorkerPool(start_method="fork") as pool:
+            results = pool.map(
+                main,
+                tasks,
+            )
+        return results
