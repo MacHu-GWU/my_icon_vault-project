@@ -110,12 +110,13 @@ class IconAsset:
             s3path.write_bytes(path.read_bytes(), bsm=s3_client)
 
     def to_icon_list_bullet(self) -> str:
+        identifier = self.name
         try:
-            description = self.path_readme.read_text("utf-8").splitlines()[0].strip()
-            identifier = self.name
+            lines = self.path_readme.read_text("utf-8").splitlines()
+            if len(lines) == 0:
+                description = ""
+            else:
+                description = lines[0].strip()
             return f"- {identifier}: {description}"
         except FileNotFoundError:
-            return ""
-
-    def generate_icon_list_md(self):
-        self.dir_asset
+            return f"- {identifier}:"
