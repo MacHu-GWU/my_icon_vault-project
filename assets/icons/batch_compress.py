@@ -15,6 +15,6 @@ for icon_asset in IconAsset.list_all():
 
 if __name__ == "__main__":
     """ """
-    SvgoCmd.parallel_run(svgo_cmds)
-    # Svg2PngCmd.parallel_run(svg2png_cmds)
-    # PngQuantCmd.parallel_run(pngquant_cmds)
+    SvgoCmd.parallel_run(svgo_cmds, verbose=True)
+    # Svg2PngCmd.parallel_run(svg2png_cmds, verbose=True)
+    # PngQuantCmd.parallel_run(pngquant_cmds, verbose=True)
