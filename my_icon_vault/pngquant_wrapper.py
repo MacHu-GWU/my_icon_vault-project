@@ -10,8 +10,8 @@ structure when batch processing and allows fine-tuned control over compression s
 including quality ranges, speed/quality trade-offs, and color palette sizes.
 
 Example usage:
+
 - Single file: Compress one PNG with specific quality settings
-- Batch processing: Recursively compress all PNGs in a directory tree
 - Parallel processing: Use multiprocessing to speed up batch operations
 
 Typical use cases include optimizing PNG assets for web deployment, reducing storage
@@ -64,7 +64,20 @@ class PngQuantCmd:
 
     def to_args(self) -> list[str]:
         """
-        Convert arguments to command line arguments list.
+        Convert the dataclass fields to pngquant command line arguments.
+
+        Returns:
+            List of command line arguments ready to be passed to subprocess.run().
+
+        Example:
+            >>> cmd = PngQuantCmd(
+            ...     path_bin=Path("pngquant"),
+            ...     path_in=Path("input.png"),
+            ...     quality_range=(80, 95),
+            ...     speed=4
+            ... )
+            >>> args = cmd.to_args()
+            >>> # Returns: ["pngquant", "--quality", "80-95", "--speed", "4", "input.png"]
         """
         args = [
             str(self.path_bin),
@@ -83,11 +96,27 @@ class PngQuantCmd:
 
     def run(self, verbose: bool = False):
         """
-        Execute pngquant compression on a single file.
+        Execute pngquant compression on the specified input PNG file.
+
+        This method constructs the command line arguments and runs the pngquant
+        subprocess to compress the PNG file according to the specified settings.
 
         Args:
-            path_bin: Path to pngquant binary executable
-            path_in: Input PNG file path to compress
+            verbose: If True, prints the full command line before execution.
+
+        Raises:
+            subprocess.CalledProcessError: If pngquant exits with non-zero status.
+            FileNotFoundError: If the pngquant binary is not found.
+
+        Example:
+            >>> cmd = PngQuantCmd(
+            ...     path_bin=Path("pngquant"),
+            ...     path_in=Path("large.png"),
+            ...     path_out=Path("compressed.png"),
+            ...     quality_range=(65, 85)
+            ... )
+            >>> cmd.run(verbose=True)
+            # Outputs: pngquant --quality 65-85 --output compressed.png large.png
         """
         args = self.to_args()
         if verbose:
@@ -99,8 +128,30 @@ class PngQuantCmd:
         """
         Batch process multiple PNG files in parallel using multiprocessing.
 
+        This method uses the mpire library to distribute PNG compression tasks
+        across multiple CPU cores for improved performance when processing
+        large numbers of files. Progress is printed for each file processed.
+
         Args:
-            cmds: List of PngQuantCmd instances for each file to compress
+            cmds: List of PngQuantCmd instances, each configured for a specific
+                  input file and compression settings.
+
+        Returns:
+            List of results from each worker process (typically None for each
+            successful compression).
+
+        Raises:
+            subprocess.CalledProcessError: If any pngquant process fails.
+            FileNotFoundError: If pngquant binary is not found.
+
+        Example:
+            >>> cmds = [
+            ...     PngQuantCmd(path_bin=Path("pngquant"), path_in=Path("img1.png")),
+            ...     PngQuantCmd(path_bin=Path("pngquant"), path_in=Path("img2.png")),
+            ... ]
+            >>> PngQuantCmd.parallel_run(cmds)
+            [1] Compressing: img1.png -> img1.png
+            [2] Compressing: img2.png -> img2.png
         """
 
         def main(ith: int, cmd: PngQuantCmd):
