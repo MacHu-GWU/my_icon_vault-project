@@ -15,10 +15,7 @@ def test_run():
         path_out=path_png,
         quality_range=(50, 75),
     )
-    cmd.run()
-    size_before = path_test_png.stat().st_size
-    size_after = path_png.stat().st_size
-    print(f"Size before: {size_before}, after: {size_after}")
+    cmd.run(verbose=True)
 
 
 if __name__ == "__main__":

@@ -32,9 +32,11 @@ from pathlib import Path
 import mpire
 import cairosvg
 
+from .base import BaseCmd
+
 
 @dataclasses.dataclass
-class Svg2PngCmd:
+class Svg2PngCmd(BaseCmd):
     """
     Command configuration for converting SVG files to PNG format.
 
@@ -66,12 +68,11 @@ class Svg2PngCmd:
         - Thumbnails: 200x200, 300x300
         - High-res graphics: 512x512, 1024x1024
     """
-    path_in: Path = dataclasses.field()
-    path_out: Path = dataclasses.field()
+
     output_width: int = dataclasses.field()
     output_height: int = dataclasses.field()
 
-    def run(self):
+    def run(self, verbose: bool = False):
         """
         Execute SVG to PNG conversion for the configured input file.
 
@@ -95,15 +96,19 @@ class Svg2PngCmd:
             >>> cmd.run()
             # Creates logo_64x64.png with 64x64 pixel dimensions
         """
+        if verbose:
+            self._log_before()
         cairosvg.svg2png(
             bytestring=self.path_in.read_text(encoding="utf-8"),
             write_to=str(self.path_out),
             output_width=self.output_width,
             output_height=self.output_height,
         )
+        if verbose:
+            self._log_after()
 
     @classmethod
-    def parallel_run(cls, cmds: list["Svg2PngCmd"]):
+    def parallel_run(cls, cmds: list["Svg2PngCmd"], verbose: bool = False):
         """
         Batch convert multiple SVG files to PNG in parallel using multiprocessing.
 
@@ -144,7 +149,7 @@ class Svg2PngCmd:
 
         def main(ith: int, cmd: Svg2PngCmd):
             print(f"[{ith}] Converting: {cmd.path_in} -> {cmd.path_out}")
-            cmd.run()
+            cmd.run(verbose=verbose)
 
         tasks = [{"ith": i, "cmd": cmd} for i, cmd in enumerate(cmds, start=1)]
         with mpire.WorkerPool(start_method="fork") as pool:

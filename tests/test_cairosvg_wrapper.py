@@ -14,10 +14,7 @@ def test_svg2png():
         output_width=128,
         output_height=128,
     )
-    cmd.run()
-    size_before = path_test_svg.stat().st_size
-    size_after = path_png.stat().st_size
-    print(f"Size before: {size_before}, after: {size_after}")
+    cmd.run(verbose=True)
 
 
 if __name__ == "__main__":

@@ -25,9 +25,11 @@ from pathlib import Path
 
 import mpire
 
+from .base import BaseCmd
+
 
 @dataclasses.dataclass
-class PngQuantCmd:
+class PngQuantCmd(BaseCmd):
     """
     PNG compression arguments for pngquant tool.
 
@@ -54,9 +56,7 @@ class PngQuantCmd:
        path_out: Output file path. If None, uses input filename with suffix.
     """
 
-    path_bin: Path = dataclasses.field(default=None)
-    path_in: Path = dataclasses.field(default=None)
-    path_out: Path | None = dataclasses.field(default=None)
+    path_bin: Path = dataclasses.field()
     quality_range: tuple[int, int] = dataclasses.field(default=(80, 95))
     speed: int | None = dataclasses.field(default=None)
     force: bool = dataclasses.field(default=False)
@@ -119,12 +119,16 @@ class PngQuantCmd:
             # Outputs: pngquant --quality 65-85 --output compressed.png large.png
         """
         args = self.to_args()
+        # if verbose:
+        #     print(" ".join(args))
         if verbose:
-            print(" ".join(args))
+            self._log_before()
         subprocess.run(args, check=True)
+        if verbose:
+            self._log_after()
 
     @classmethod
-    def parallel_run(cls, cmds: list["PngQuantCmd"]):
+    def parallel_run(cls, cmds: list["PngQuantCmd"], verbose: bool = False):
         """
         Batch process multiple PNG files in parallel using multiprocessing.
 
@@ -156,7 +160,7 @@ class PngQuantCmd:
 
         def main(ith: int, cmd: PngQuantCmd):
             print(f"[{ith}] Compressing: {cmd.path_in} -> {cmd.path_out}")
-            cmd.run(verbose=False)
+            cmd.run(verbose=verbose)
 
         tasks = [{"ith": i, "cmd": cmd} for i, cmd in enumerate(cmds, start=1)]
         with mpire.WorkerPool(start_method="fork") as pool:

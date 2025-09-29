@@ -17,10 +17,7 @@ def test_run():
         quite=True,
         multipass=True,
     )
-    cmd.run()
-    size_before = path_test_svg.stat().st_size
-    size_after = path_svg.stat().st_size
-    print(f"Size before: {size_before}, after: {size_after}")
+    cmd.run(verbose=True)
 
 
 if __name__ == "__main__":

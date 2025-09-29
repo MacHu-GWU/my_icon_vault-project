@@ -38,9 +38,11 @@ from pathlib import Path
 
 import mpire
 
+from .base import BaseCmd
+
 
 @dataclasses.dataclass
-class SvgoCmd:
+class SvgoCmd(BaseCmd):
     """
     Command configuration for optimizing SVG files using SVGO.
 
@@ -81,8 +83,6 @@ class SvgoCmd:
     """
 
     path_bin: Path = dataclasses.field()
-    path_in: Path = dataclasses.field()
-    path_out: Path = dataclasses.field()
     precision: int | None = dataclasses.field(default=None)
     quite: bool = dataclasses.field(default=False)
     multipass: bool = dataclasses.field(default=True)
@@ -158,12 +158,16 @@ class SvgoCmd:
             # File size typically reduced by 20-60% depending on original optimization
         """
         args = self.args
+        # if verbose:
+        #     print(" ".join(args))
         if verbose:
-            print(" ".join(args))
+            self._log_before()
         subprocess.run(args, check=True)
+        if verbose:
+            self._log_after()
 
     @classmethod
-    def parallel_run(cls, cmds: list["SvgoCmd"]):
+    def parallel_run(cls, cmds: list["SvgoCmd"], verbose: bool = False):
         """
         Batch optimize multiple SVG files in parallel using multiprocessing.
 
@@ -208,7 +212,7 @@ class SvgoCmd:
 
         def main(ith: int, cmd: SvgoCmd):
             print(f"[{ith}] Compressing: {cmd.path_in} -> {cmd.path_out}")
-            cmd.run(verbose=False)
+            cmd.run(verbose=verbose)
 
         tasks = [{"ith": i, "cmd": cmd} for i, cmd in enumerate(cmds, start=1)]
         with mpire.WorkerPool(start_method="fork") as pool:
