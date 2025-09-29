@@ -8,4 +8,4 @@ if __name__ == "__main__":
     # one.generate_png()
     # one.compress_png()
     # one.upload_to_cloudflare_r2()
-    one.generate_icon_list_md()
+    # one.generate_icon_list_md()
