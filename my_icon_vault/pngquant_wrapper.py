@@ -19,7 +19,6 @@ requirements for image archives, or preparing graphics for mobile applications w
 file size matters.
 """
 
-import shutil
 import subprocess
 import dataclasses
 from pathlib import Path
@@ -94,6 +93,27 @@ class PngQuantCmd:
         if verbose:
             print(" ".join(args))
         subprocess.run(args, check=True)
+
+    @classmethod
+    def parallel_run(cls, cmds: list["PngQuantCmd"]):
+        """
+        Batch process multiple PNG files in parallel using multiprocessing.
+
+        Args:
+            cmds: List of PngQuantCmd instances for each file to compress
+        """
+
+        def main(ith: int, cmd: PngQuantCmd):
+            print(f"[{ith}] Compressing: {cmd.path_in} -> {cmd.path_out}")
+            cmd.run(verbose=False)
+
+        tasks = [{"ith": i, "cmd": cmd} for i, cmd in enumerate(cmds, start=1)]
+        with mpire.WorkerPool(start_method="fork") as pool:
+            results = pool.map(
+                main,
+                tasks,
+            )
+        return results
 
 
 # def batch_compress(
