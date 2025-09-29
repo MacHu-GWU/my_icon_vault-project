@@ -1,17 +1,32 @@
-Project Specific Guide:
+# my_icon_vault Project Guide
 
-See @README.rst for project overview
+## Project Overview
 
-Code Structure
+See @README.rst for complete project overview.
 
-- Source Code: my_icon_vault/**/*.py
-- Unit test: tests/**/*.py
-- Documentation: docs/source/**/*.index
+## Core Development Guides
 
-Additional Python Best Practices Used in this Project:
+### Python Development Standards
 
-- Virtual Environment Setup: @~/.claude/claude-markdown/pywf_open_source/pywf-open-source-Python-virtual-environment-setup-instruction-CLAUDE.md
-- Test Strategy: @~/.claude/claude-markdown/pywf_open_source/pywf-open-source-Python-test-strategy-instruction-CLAUDE.md
-- Python docstring Guide: @~/.claude/claude-markdown/pywf_open_source/pywf-open-source-Python-docstring-guide-CLAUDE.md
-- Cross Reference API Doc Guide: @~/.claude/claude-markdown/pywf_open_source/pywf-open-source-Python-cross-reference-api-doc-guide-CLAUDE.md
-- Document Structure Guide: @~/.claude/claude-markdown/pywf_open_source/pywf-open-source-Python-documentation-structure-guide-CLAUDE.md
+- **Virtual Environment**: @./.claude/md/Python-virtual-environment-setup-instruction.md
+- **Testing Strategy**: @./.claude/md/Python-test-strategy-instruction.md
+- **Docstring Guide**: @./.claude/md/pywf-open-source-Python-docstring-guide.md
+- **API Documentation**: @./.claude/md/pywf-open-source-Python-cross-reference-api-doc-guide.md
+- **Documentation Structure**: @./.claude/md/pywf-open-source-Python-documentation-structure-guide.md
+
+## Essential Commands
+
+- **All Operations**: @./Makefile (run `make help` for full command list)
+- **Python Execution**: Use `.venv/bin/python` for all Python scripts in:
+  - `debug/**/*.py` - Debug utilities
+  - `scripts/**/*.py` - Automation scripts
+  - `config/**/*.py` - Configuration deployment
+  - `tests/**/*.py` - Unit and integration tests
+
+## Quick Start Workflow
+
+1. **Setup**: `make venv-create && make install-all`
+2. **Update Dependencies**: ``make poetry-lock && make poetry-export && make install``
+3. **Development**: Edit code in ``my_icon_vault/**/*.py`` → Run tests ``.venv/bin/python tests/**/*.py``
+4. **Testing**: `make test` or `make cov` for coverage
+5. **Build Document**: `make build-doc && make view-doc` for build sphinx docs and open local html doc site in web browser
