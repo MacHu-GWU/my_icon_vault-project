@@ -43,6 +43,10 @@ classifier = [
 # Core Dependencies
 # ------------------------------------------------------------------------------
 dependencies = [
+    "home_secret>=0.1.3,<1.0.0", # manage secret (e.g., API keys, tokens, passwords)
+    "boto3>=1.40.0,<2.0.0", # AWS SDK for Python
+    "boto_session_manager>=1.8.1,<2.0.0", # manage AWS boto3 session
+    "s3pathlib>=2.3.6,<3.0.0", # manage AWS S3 resources
     "mpire>=2.10.0,<3.0.0", # parallel processing
     "requests>=2.32.2,<3.0.0", # HTTP library
     "CairoSVG>=2.8.2,<3.0.0", # SVG to PNG/JPG/PDF converter
