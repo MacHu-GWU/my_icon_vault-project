@@ -39,3 +39,5 @@ dir_docs_build_html = dir_project_root / "docs" / "build" / "html"
 
 path_bin_pngquant = dir_home / "pngquant" / "pngquant"
 path_bin_svgo = "svgo"
+
+path_icon_list_md = dir_project_root / "icon-list.md"

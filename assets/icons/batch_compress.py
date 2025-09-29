@@ -1,20 +1,11 @@
 # -*- coding: utf-8 -*-
 
-from my_icon_vault.svgo_wrapper import SvgoCmd
-from my_icon_vault.cairosvg_wrapper import Svg2PngCmd
-from my_icon_vault.pngquant_wrapper import PngQuantCmd
-from my_icon_vault.structure import IconAsset
-
-svgo_cmds = list()
-svg2png_cmds = list()
-pngquant_cmds = list()
-for icon_asset in IconAsset.list_all():
-    svgo_cmds.append(icon_asset.to_svgo_cmd())
-    svg2png_cmds.extend(icon_asset.to_svg2png_cmds())
-    pngquant_cmds.extend(icon_asset.to_pngquant_cmds())
+from my_icon_vault.one import one
 
 if __name__ == "__main__":
     """ """
-    SvgoCmd.parallel_run(svgo_cmds, verbose=True)
-    # Svg2PngCmd.parallel_run(svg2png_cmds, verbose=True)
-    # PngQuantCmd.parallel_run(pngquant_cmds, verbose=True)
+    # one.compress_svg()
+    # one.generate_png()
+    # one.compress_png()
+    # one.upload_to_cloudflare_r2()
+    one.generate_icon_list_md()

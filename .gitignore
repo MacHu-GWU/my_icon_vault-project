@@ -1,6 +1,7 @@
 # User Settings
 my_icon_vault.egg-info/
 docs/source/**/index.md
+icon-list.md
 tmp/
 
 # Byte-compiled / optimized / DLL files

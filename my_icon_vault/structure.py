@@ -4,7 +4,10 @@ import dataclasses
 from pathlib import Path
 from functools import cached_property
 
-from .paths import dir_project_root, path_bin_svgo, path_bin_pngquant
+from s3pathlib import S3Path
+
+from .constants import size_list
+from .paths import dir_project_root, dir_tmp, path_bin_svgo, path_bin_pngquant
 from .svgo_wrapper import SvgoCmd
 from .cairosvg_wrapper import Svg2PngCmd
 from .pngquant_wrapper import PngQuantCmd
@@ -51,12 +54,11 @@ class IconAsset:
         )
 
     def to_svg2png_cmds(self):
-        size_list = [96, 256, 512]
         cmds = list()
         for size in size_list:
             cmd = Svg2PngCmd(
                 path_in=self.path_svg,
-                path_out=self.get_path_png(size, size),
+                path_out=dir_tmp / self.get_path_png(size, size).name,
                 output_width=size,
                 output_height=size,
             )
@@ -64,50 +66,56 @@ class IconAsset:
         return cmds
 
     def to_pngquant_cmds(self):
-        size_list = [96, 256, 512]
         cmds = list()
         for size in size_list:
+            path_out = self.get_path_png(size, size)
+            path_out.unlink(missing_ok=True)
             cmd = PngQuantCmd(
                 path_bin=path_bin_pngquant,
-                path_in=self.get_path_png(size, size),
-                path_out=self.get_path_png(size, size),
-                quality_range=(50, 75),
+                path_in=dir_tmp / self.get_path_png(size, size).name,
+                path_out=path_out,
+                quality_range=(25, 50),
+                # quality_range=(50, 75),
             )
             cmds.append(cmd)
         return cmds
 
-    @cached_property
-    def path_png_96x96(self) -> Path:
-        return self.get_path_png(96, 96)
+    def get_local_and_s3_pairs(
+        self,
+        s3dir_root: S3Path,
+    ) -> list[tuple[Path, S3Path]]:
+        pairs = [
+            (
+                self.path_svg,
+                s3dir_root.joinpath(*self.path_svg.relative_to(dir_project_root).parts),
+            ),
+        ]
+        for size in size_list:
+            path_png = self.get_path_png(size, size)
+            pairs.append(
+                (
+                    path_png,
+                    s3dir_root.joinpath(*path_png.relative_to(dir_project_root).parts),
+                )
+            )
+        return pairs
 
-    @cached_property
-    def path_png_256x256(self) -> Path:
-        return self.get_path_png(256, 256)
+    def upload_to_cloudflare_r2(
+        self,
+        s3_client,
+        s3dir_root: S3Path,
+    ):
+        pairs = self.get_local_and_s3_pairs(s3dir_root)
+        for path, s3path in pairs:
+            s3path.write_bytes(path.read_bytes(), bsm=s3_client)
 
-    @cached_property
-    def path_png_512x512(self) -> Path:
-        return self.get_path_png(512, 512)
+    def to_icon_list_bullet(self) -> str:
+        try:
+            description = self.path_readme.read_text("utf-8").splitlines()[0].strip()
+            identifier = self.name
+            return f"- {identifier}: {description}"
+        except FileNotFoundError:
+            return ""
 
-    @cached_property
-    def path_png_1024x1024(self) -> Path:
-        return self.get_path_png(1024, 1024)
-
-    def generate_png_96x96(self):
-        path = self.path_png_96x96
-        path.unlink(missing_ok=True)
-        svg2png(self.path_svg, path, 96, 96)
-
-    def generate_png_256x256(self):
-        path = self.path_png_256x256
-        path.unlink(missing_ok=True)
-        svg2png(self.path_svg, path, 256, 256)
-
-    def generate_png_512x512(self):
-        path = self.path_png_512x512
-        path.unlink(missing_ok=True)
-        svg2png(self.path_svg, path, 512, 512)
-
-    def generate_png_1024x1024(self):
-        path = self.path_png_1024x1024
-        path.unlink(missing_ok=True)
-        svg2png(self.path_svg, path, 1024, 1024)
+    def generate_icon_list_md(self):
+        self.dir_asset
